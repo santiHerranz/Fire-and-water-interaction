@@ -2,6 +2,9 @@
 
 ![screenshot](./screenshot.png)
 
+[Demo online](https://santiherranz.github.io/Fire-and-water-interaction/)
+
+
 - Fire
 - Water
 
