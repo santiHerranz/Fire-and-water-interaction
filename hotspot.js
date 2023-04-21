@@ -5,10 +5,10 @@ function HotSpot(x, y, xs, ys) {
   this.y = groundPoint;
   this.radius = 20;
 
-  this.lifeMax = 1000;
-  this.life = this.lifeMax;
+  this.healthMax = 1000;
+  this.health = this.healthMax;
 
-  this.max = 50;
+  this.max = 100;
   this.speed = 1.5;
   this.size = 8;
 
@@ -28,6 +28,9 @@ HotSpot.prototype.addListener = function (listener) {
 
 HotSpot.prototype.step = function (dt) {
 
+
+  this.max = 100 * (this.health/this.healthMax)
+
   //Move the particle based on its horizontal and vertical speeds
   this.x += 0;
   this.y += gravity * 8;
@@ -39,7 +42,7 @@ HotSpot.prototype.step = function (dt) {
   if (this.y > groundPoint)
     this.y = groundPoint;
 
-  for (var i = 0; i < 1; i++) {
+  for (var i = 0; i < 1*this.health/this.healthMax; i++) {
     //Adds a particle at the position, with random horizontal and vertical speeds
     var p = new FireParticle(this.x + (Math.random() - 0.5) * this.fireWidth, groundPoint, ((Math.random() - 0.5) * this.speed) / 2, 0 - Math.random() * 2 * this.speed);
     this.particles.push(p);
@@ -47,7 +50,7 @@ HotSpot.prototype.step = function (dt) {
 
   this.smoking({ x: this.x, y: this.y });
 
-  this.life -= 0.1;
+  this.health -= 0.1;
 }
 
 HotSpot.prototype.draw = function (ctx) {
@@ -71,12 +74,12 @@ HotSpot.prototype.draw = function (ctx) {
     ctx.strokeStyle = "#ff0000";
     ctx.lineWidth = 3;
     ctx.moveTo(this.x - 10, groundPoint + offset);
-    ctx.lineTo(this.x - 10 + 20 * (this.life / this.lifeMax), groundPoint + offset);
+    ctx.lineTo(this.x - 10 + 20 * (this.health / this.healthMax), groundPoint + offset);
     ctx.stroke();
     ctx.restore();
   }
 
-  if (this.drawMode == "WIREFRAME") {
+  if (this.drawMode == Game.DRAWMODE.WIREFRAME) {
     ctx.save();
     ctx.strokeStyle = "red";
     ctx.beginPath();
@@ -84,7 +87,7 @@ HotSpot.prototype.draw = function (ctx) {
     ctx.stroke();
 
     ctx.restore();
-    return;
+    // return;
   }
 
 
@@ -111,7 +114,7 @@ HotSpot.prototype.draw = function (ctx) {
 
     ctx.beginPath();
     //Draw the particle as a circle, which gets slightly smaller the longer it's been alive for
-    ctx.arc(this.particles[i].x, this.particles[i].y, (this.max - this.particles[i].life) / this.max * (this.size / 2) + (this.size / 2), 0, 2 * Math.PI);
+    ctx.arc(this.particles[i].x, this.particles[i].y, Math.max(1, (this.max - this.particles[i].life) / this.max * (this.size / 2) + (this.size / 2)), 0, 2 * Math.PI);
     ctx.fill();
 
     //Move the particle based on its horizontal and vertical speeds

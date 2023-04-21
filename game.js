@@ -1,4 +1,6 @@
 class Game {
+
+    static DRAWMODE = {NORMAL:1, WIREFRAME:2}
     constructor(x, y) {
 
         this.x = x;
@@ -15,11 +17,9 @@ class Game {
         this.smoke = [];
 
 
-        this.drawMode = ""; //"WIREFRAME"; //
+        this.drawMode = Game.DRAWMODE.NORMAL;
 
-        let fire = new HotSpot(x, y);
-        fire.addListener(this);
-        this.hotSpot.push(fire);
+
 
         // let cloud = new Cloud(x, y);
         // cloud.addListener(this);
@@ -29,6 +29,39 @@ class Game {
 
 
     step(dt) {
+
+
+        if (Math.random() > .99) {
+            let fire = new HotSpot(cWidth * Math.random(), groundPoint);
+            fire.addListener(this);
+            this.hotSpot.push(fire);            
+        }
+
+
+        if (mouseDown && !mouseUp) {
+
+            if (mousePos.y < groundPoint) {
+                if (this.clouds.length < 50) {
+                        let cloud = new Cloud(mousePos.x, mousePos.y);
+                        cloud.addListener(this);
+                        this.clouds.push(cloud);
+                }
+            } else {
+                if (this.hotSpot.length < 50) {
+                        let fires = this.hotSpot.filter(fire => { return this.collide(fire,{x:mousePos.x,y:groundPoint,radius:20})})
+                        if (fires.length > 0)
+                            fires.forEach(fire => fire.health = fire.healthMax );
+                        else {
+                            let fire = new HotSpot(mousePos.x, mousePos.y);
+                            fire.addListener(this);
+                            this.hotSpot.push(fire);
+                        }
+
+                }
+            }
+
+
+        }
 
         this.hotSpot.forEach(fire => fire.step(dt));
         this.clouds.forEach(cloud => cloud.step(dt));
@@ -40,7 +73,7 @@ class Game {
                 .forEach(cloud => {
                     if (this.collide(fire, cloud)) {
                         if (cloud.damagePoints > 0) {
-                            fire.life -= cloud.damagePoints;
+                            fire.health -= cloud.damagePoints;
                             cloud.activeTime = 0;
                             cloud.damagePoints = 0;
                         }
@@ -49,7 +82,7 @@ class Game {
         });
 
 
-        this.hotSpot = this.hotSpot.filter(fire => fire.life > 0);
+        this.hotSpot = this.hotSpot.filter(fire => fire.health > 0);
         this.clouds = this.clouds.filter(cloud => cloud.life > 0);
         this.smoke = this.smoke.filter(particle => particle.life > 0);
 
@@ -65,30 +98,30 @@ class Game {
     }
 
     event(type, position) {
-        if (type == "mousedown") {
+        // if (type == "mousedown") {
 
-            if (position.y < cHeight * 2 / 3) {
-                if (this.clouds.length < 50) {
-                        let cloud = new Cloud(position.x, position.y);
-                        cloud.addListener(this);
-                        this.clouds.push(cloud);
-                }
-            } else {
-                if (this.hotSpot.length < 50) {
-                        let fires = this.hotSpot.filter(fire => { return this.collide(fire,{x:position.x,y:groundPoint,radius:20})})
-                        if (fires.length > 0)
-                            fires.forEach(fire => fire.life = fire.lifeMax );
-                        else {
-                            let fire = new HotSpot(position.x, position.y);
-                            fire.addListener(this);
-                            this.hotSpot.push(fire);
-                        }
+        //     if (position.y < groundPoint) {
+        //         if (this.clouds.length < 50) {
+        //                 let cloud = new Cloud(position.x, position.y);
+        //                 cloud.addListener(this);
+        //                 this.clouds.push(cloud);
+        //         }
+        //     } else {
+        //         if (this.hotSpot.length < 50) {
+        //                 let fires = this.hotSpot.filter(fire => { return this.collide(fire,{x:position.x,y:groundPoint,radius:20})})
+        //                 if (fires.length > 0)
+        //                     fires.forEach(fire => fire.health = fire.healthMax );
+        //                 else {
+        //                     let fire = new HotSpot(position.x, position.y);
+        //                     fire.addListener(this);
+        //                     this.hotSpot.push(fire);
+        //                 }
 
-                }
-            }
+        //         }
+        //     }
 
 
-        }
+        // }
     }
 
     smoking(position) {

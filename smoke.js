@@ -10,7 +10,7 @@ var SmokeParticle = function(x,y, v, r = 1) {
 	this.vx = v.x;
 	this.vy = v.y;
 	this.radius = r;
-	this.life = 200;
+	this.life = 100 + 100*Math.random();
     this.strokeColor = smokeColors[randNum(0, smokeColors.length-1)];
     this.fillColor = smokeColors[randNum(0, smokeColors.length-1)];
 }
